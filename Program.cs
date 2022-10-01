@@ -10,7 +10,7 @@ public static class Program
             _ =  ReadCommands();
         async Task ReadCommands()
         {
-            "\nCommands:\nStart | Stop | Restart | Listen | Clear".Print();
+            "\nCommands:\nStart | Stop | Restart | Listen | Status | Clear".Print();
             switch (Console.ReadLine()?.ToLower())
             {
                 case "start":
@@ -25,6 +25,9 @@ public static class Program
                     break;
                 case "listen":
                     await server.Listen();
+                    break;
+                case "status":
+                    server.GetStatus.Print();
                     break;
                 case "clear":
                     Console.Clear();

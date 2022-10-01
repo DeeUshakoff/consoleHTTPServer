@@ -46,7 +46,7 @@ namespace consoleHTTPServer
             responseText = string.Join("\n", html_lines.Where(x => !x.Contains("rel=\"stylesheet\"")));
 
             listener = new HttpListener();
-            listener.Prefixes.Add("http://localhost:8888/");
+           
             listener.Prefixes.Add("http://localhost:8888/google/");
             listener.Start();
 
