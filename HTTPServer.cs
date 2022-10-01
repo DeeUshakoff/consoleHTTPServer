@@ -4,10 +4,17 @@ namespace consoleHTTPServer
 {
     public class HTTPServer
     {
+        private ServerStatus _status = ServerStatus.Stopped;
+        public ServerStatus GetStatus => _status;
         private HttpListener? listener;
         string responseText = "";
+
+     
         public void Start()
         {
+            if (GetStatus == ServerStatus.Started)
+                return;
+
             var dialog = new OpenFileDialog
             {
                 Multiselect = false,
@@ -36,12 +43,14 @@ namespace consoleHTTPServer
                         break;
                     }
 
-            responseText = String.Join("\n", html_lines.Where(x => !x.Contains("rel=\"stylesheet\"")));
+            responseText = string.Join("\n", html_lines.Where(x => !x.Contains("rel=\"stylesheet\"")));
 
             listener = new HttpListener();
             listener.Prefixes.Add("http://localhost:8888/");
             listener.Prefixes.Add("http://localhost:8888/google/");
             listener.Start();
+
+            _status = ServerStatus.Started;
             "Started...".Print(ConsoleColor.Green);
         }
         
@@ -52,6 +61,9 @@ namespace consoleHTTPServer
                 "Listener is null, please use \"Start\" command before".Print(ConsoleColor.Red);
                 return;
             }
+            if (GetStatus == ServerStatus.Listening)
+                return;
+            _status = ServerStatus.Listening;
             "Waiting for connection...".Print(ConsoleColor.Yellow);
 
             while (true)
@@ -59,6 +71,8 @@ namespace consoleHTTPServer
                 HttpListenerContext context = await listener.GetContextAsync();
                 _ = context.Request;
                 HttpListenerResponse response = context.Response;
+
+                responseText ??= "<html><head><meta charset='utf8'></head><body>Страница не найдена</body></html>";
 
                 byte[] buffer = System.Text.Encoding.UTF8.GetBytes(responseText);
 
@@ -74,10 +88,20 @@ namespace consoleHTTPServer
 
         public void Stop()
         {
+            if (GetStatus == ServerStatus.Stopped)
+                return;
+
             listener?.Stop();
+            _status = ServerStatus.Stopped;
             "Listener stopped".Print(ConsoleColor.Yellow);
         }
 
+        public enum ServerStatus
+        {
+            Started,
+            Stopped,
+            Listening
+        }
     }
 
 }
