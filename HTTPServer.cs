@@ -45,6 +45,12 @@ namespace consoleHTTPServer
 
             responseText = string.Join("\n", html_lines.Where(x => !x.Contains("rel=\"stylesheet\"")));
 
+            if(string.IsNullOrWhiteSpace(responseText))
+            {
+                Start();
+                return;
+            }
+
             listener = new HttpListener();
            
             listener.Prefixes.Add("http://localhost:8888/google/");
@@ -61,7 +67,7 @@ namespace consoleHTTPServer
                 "Listener is null, please use \"Start\" command before".Print(ConsoleColor.Red);
                 return;
             }
-            if (GetStatus == ServerStatus.Listening)
+            if (GetStatus == ServerStatus.Listening || GetStatus == ServerStatus.Stopped)
                 return;
             _status = ServerStatus.Listening;
             "Waiting for connection...".Print(ConsoleColor.Yellow);
